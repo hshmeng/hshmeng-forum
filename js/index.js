@@ -1,11 +1,10 @@
-const owner = "hshmeng";             // 仓库用户名
-const repo = "hshmeng-forum";        // 仓库名
+const owner = "hshmeng";
+const repo = "hshmeng-forum";
 
 async function loadIssues() {
     const container = document.getElementById("issues-container");
 
     try {
-        // 拉取仓库所有开放的 Issue
         const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/issues?state=open&per_page=100`, {
             headers: { "Accept": "application/vnd.github+json" }
         });
@@ -17,12 +16,30 @@ async function loadIssues() {
             return;
         }
 
-        // 遍历每个 Issue，生成帖子卡片
         issues.forEach(issue => {
             const div = document.createElement("div");
             div.className = "issue-card";
 
-            // 帖子 HTML 结构
+            // 生成标签 HTML
+            let labelsHtml = "";
+            if (issue.labels && issue.labels.length > 0) {
+                labelsHtml = `<div class="issue-labels">`;
+                issue.labels.forEach(label => {
+                    // 使用 GitHub API 返回的 color
+                    const labelColor = `#${label.color}`;
+                    // 如果颜色过浅，可以调整文字颜色为黑色
+                    let textColor = "#fff";
+                    // 判断亮色背景，简单阈值处理
+                    const rgb = parseInt(label.color, 16);
+                    if ((rgb & 0xff) + ((rgb >> 8) & 0xff) + ((rgb >> 16) & 0xff) > 382) { // 简单亮色判断
+                        textColor = "#333";
+                    }
+
+                    labelsHtml += `<span class="issue-label" style="background-color:${labelColor}; color:${textColor}">${label.name}</span>`;
+                });
+                labelsHtml += `</div>`;
+            }
+
             div.innerHTML = `
         <div class="issue-header">
           <div class="issue-header-left">
@@ -32,17 +49,17 @@ async function loadIssues() {
           <div class="issue-time">${new Date(issue.created_at).toLocaleString()}</div>
         </div>
         <div class="issue-body">${issue.body || ""}</div>
+        ${labelsHtml} <!-- 标签显示在评论上方 -->
         <div class="comments-toggle">评论 (${issue.comments}) ▼</div>
         <div class="comments-container"></div>
       `;
+
             container.appendChild(div);
 
-            // 获取评论按钮和评论容器
             const toggleEl = div.querySelector(".comments-toggle");
             const commentsContainer = div.querySelector(".comments-container");
-            let commentsLoaded = false;   // 标记评论是否已加载
+            let commentsLoaded = false;
 
-            // 点击评论按钮显示/隐藏评论
             toggleEl.addEventListener("click", async () => {
                 if (commentsContainer.style.display === "block") {
                     commentsContainer.style.display = "none";
@@ -52,12 +69,10 @@ async function loadIssues() {
                 commentsContainer.style.display = "block";
                 toggleEl.textContent = `评论 (${issue.comments}) ▲`;
 
-                // 如果评论已经加载过就不重复拉取
                 if (commentsLoaded) return;
                 commentsLoaded = true;
                 commentsContainer.innerHTML = "";
 
-                // 拉取评论
                 const commentsRes = await fetch(issue.comments_url, {
                     headers: { "Accept": "application/vnd.github+json" }
                 });
@@ -67,7 +82,6 @@ async function loadIssues() {
                     return;
                 }
 
-                // 遍历评论生成 HTML
                 comments.forEach(c => {
                     const cdiv = document.createElement("div");
                     cdiv.className = "comment";
@@ -84,10 +98,9 @@ async function loadIssues() {
         });
 
     } catch (err) {
-        // 出错时显示错误信息
         container.innerHTML = `<p style="color:red;text-align:center;">加载失败: ${err.message}</p>`;
     }
 }
 
-// 页面加载后执行
+// 加载帖子
 loadIssues();

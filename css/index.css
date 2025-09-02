@@ -1,55 +1,58 @@
-/* 全局样式 */
+/* ========== 全局样式 ========== */
 body {
     font-family: "Segoe UI", Arial, sans-serif;
-    max-width: 900px;        /* 页面最大宽度 */
-    margin: 40px auto;       /* 居中并留空白边距 */
-    background: #f5f5f5;     /* 页面背景色 */
+    max-width: 900px;
+    margin: 40px auto;
+    background: #f5f5f5;
 }
 
-/* 每个帖子卡片样式 */
+/* 标题居中 */
+h1 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+/* ========== 帖子卡片 ========== */
 .issue-card {
     background: #fff;
-    border-radius: 12px;            /* 圆角 */
-    box-shadow: 0 4px 10px rgba(0,0,0,0.08); /* 阴影 */
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
     padding: 20px;
-    margin-bottom: 20px;            /* 帖子之间间距 */
-    transition: transform 0.2s;     /* hover 微动画 */
+    margin-bottom: 20px;
+    transition: transform 0.2s;
 }
 
 .issue-card:hover {
-    transform: translateY(-2px);    /* 鼠标悬停轻微上移 */
+    transform: translateY(-2px);
 }
 
-/* 帖子头部区域：头像 + 标题 + 时间 */
+/* 帖子头部：头像+标题+时间 */
 .issue-header {
     display: flex;
     align-items: center;
-    justify-content: space-between; /* 左右分布：左边头像+标题，右边时间 */
+    justify-content: space-between;
     margin-bottom: 10px;
 }
 
 .issue-header-left {
     display: flex;
     align-items: center;
-    gap: 10px;                      /* 头像与标题之间的间距 */
+    gap: 10px;
 }
 
-/* 帖子作者头像 */
 .issue-avatar {
     width: 40px;
     height: 40px;
-    border-radius: 50%;             /* 圆形头像 */
-    flex-shrink: 0;                 /* 避免被压缩 */
+    border-radius: 50%;
+    flex-shrink: 0;
 }
 
-/* 帖子标题 */
 .issue-title {
     font-size: 1.5em;
     font-weight: bold;
     color: #333;
 }
 
-/* 帖子发布时间 */
 .issue-time {
     color: #999;
     font-size: 0.9em;
@@ -58,13 +61,28 @@ body {
 
 /* 帖子正文 */
 .issue-body {
-    white-space: pre-wrap;          /* 保留换行 */
+    white-space: pre-wrap;
     line-height: 1.6;
     color: #555;
     margin-bottom: 15px;
 }
 
-/* 评论按钮 */
+/* ========== 标签 ========== */
+.issue-labels {
+    margin-bottom: 10px;
+}
+
+/* 单个标签样式 */
+.issue-label {
+    display: inline-block;
+    padding: 2px 8px;
+    margin-right: 6px;
+    border-radius: 6px;
+    font-size: 0.8em;
+    font-weight: bold;
+    color: #fff;       /* 默认白色字体，深色背景 */
+}
+/* ========== 评论按钮 ========== */
 .comments-toggle {
     cursor: pointer;
     display: inline-block;
@@ -77,18 +95,18 @@ body {
 }
 
 .comments-toggle:hover {
-    background: #0056b3;            /* 悬停变深色 */
+    background: #0056b3;
 }
 
 /* 评论容器 */
 .comments-container {
-    display: none;                  /* 默认隐藏 */
+    display: none;
     margin-top: 15px;
     border-top: 1px solid #eee;
     padding-top: 15px;
 }
 
-/* 单条评论样式 */
+/* 单条评论 */
 .comment {
     padding: 10px;
     border-radius: 10px;
@@ -96,12 +114,12 @@ body {
     margin-bottom: 10px;
     display: flex;
     align-items: flex-start;
-    gap: 10px;                      /* 评论头像与内容间距 */
+    gap: 10px;
     transition: background 0.3s;
 }
 
 .comment:hover {
-    background: #e8f0ff;/* 悬停高亮 */
+    background: #e8f0ff;
 }
 
 .comment img {
@@ -112,7 +130,7 @@ body {
 }
 
 .comment-body {
-    flex: 1;/* 占满剩余空间 */
+    flex: 1;
 }
 
 .comment .author {
@@ -128,6 +146,6 @@ body {
 
 .comment-text {
     margin-top: 3px;
-    white-space: pre-wrap;/* 保留换行 */
+    white-space: pre-wrap;
     color: #333;
 }
