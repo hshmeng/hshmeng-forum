@@ -55,14 +55,18 @@ async function loadIssues() {
             // =================== 帖子 HTML ===================
             div.innerHTML = `
                 <div class="issue-header">
-                  <div class="issue-header-left">
-                    <img src="${issue.user.avatar_url}" class="issue-avatar" alt="avatar">
-                    <div class="issue-title">${issue.title}</div>
-                  </div>
-                  <div class="issue-time">${new Date(issue.created_at).toLocaleString()}</div>
+                    <div class="issue-header-left">
+                        <img src="${issue.user.avatar_url}" class="issue-avatar" alt="avatar">
+                        <div class="issue-title">${issue.title}</div>
+                    </div>
+                    <div class="issue-time">${new Date(issue.created_at).toLocaleString()}</div>
                 </div>
-                <div class="issue-body">${issue.body || ""}</div>
+
+                <!-- 正文内容原样显示，禁止 Markdown -->
+                <div class="issue-body">${(issue.body || "").replace(/</g,"&lt;").replace(/>/g,"&gt;")}</div>
+
                 ${labelsHtml} <!-- 标签显示在正文和评论之间 -->
+
                 <div class="comments-toggle">评论 (${issue.comments}) ▼</div>
                 <div class="comments-container"></div>
             `;
@@ -111,8 +115,9 @@ async function loadIssues() {
                     cdiv.innerHTML = `
                         <img src="${c.user.avatar_url}" alt="avatar">
                         <div class="comment-body">
-                          <div><span class="author">${c.user.login}</span> <span class="time">${new Date(c.created_at).toLocaleString()}</span></div>
-                          <div class="comment-text">${c.body.replace(/</g,"&lt;").replace(/>/g,"&gt;")}</div>
+                            <div><span class="author">${c.user.login}</span> <span class="time">${new Date(c.created_at).toLocaleString()}</span></div>
+                            <!-- 评论原样显示，禁止 Markdown -->
+                            <div class="comment-text">${c.body.replace(/</g,"&lt;").replace(/>/g,"&gt;")}</div>
                         </div>
                     `;
                     commentsContainer.appendChild(cdiv);

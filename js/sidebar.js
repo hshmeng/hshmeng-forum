@@ -13,9 +13,9 @@
     const ul = document.createElement('ul');
 
     const links = [
-        { text: '如何评论', href: '#how-to-comment' },
-        { text: '删除评论', href: '#delete-comment' },
-        { text: '如何获得标签和表情', href: '#tags-emojis' }
+        { text: '如何注册和登录', href: 'html/ZhuCeDengLu.html' },
+        { text: '如何发布和评论', href: 'html/FaBuPingLun.html' },
+        { text: '删除评论的方法', href: '#delete-comment' }
     ];
 
     links.forEach(link => {
