@@ -15,7 +15,8 @@
     const links = [
         { text: '如何注册和登录', href: 'html/ZhuCeDengLu.html' },
         { text: '如何发布和评论', href: 'html/FaBuPingLun.html' },
-        { text: '删除或修改帖子和评论的方法', href: 'html/ShanChuTieZi.html' }
+        { text: '删除或修改帖子或评论', href: 'html/ShanChuTieZi.html' },
+        { text: '遇到报错怎么办', href: 'html/BaoCuo.html' },
     ];
 
     links.forEach(link => {

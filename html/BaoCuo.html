@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>报错</title>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 28px;
+            color: #007bff;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 1200px;
+            max-width: 90vw;
+            border-collapse: collapse;
+            background: #fff;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 15px 20px;
+            text-align: center;
+            font-size: 18px;
+        }
+
+        th {
+            background: #007bff;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        tr:hover {
+            background: #e6f0ff;
+            transition: 0.3s;
+        }
+
+        td:first-child {
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>常见报错及解决方法</h1>
+    <table>
+        <tr>
+            <th>报错内容</th>
+            <th>解决方法</th>
+        </tr>
+        <tr>
+            <td>加载失败: API 请求失败: 403</td>
+            <td>Github短时间内API请求过于频繁，等待一会再尝试</td>
+        </tr>
+        <tr>
+            <td>加载失败: Cannot read properties of undefined (reading 'avatar_url')</td>
+            <td>请求的API中出现错误，请刷新页面清除缓存或者等待API更新</td>
+        </tr>
+    </table>
+</div>
+</body>
+</html>
