@@ -2,31 +2,34 @@
 const owner = "hshmeng";          // GitHub 仓库拥有者
 const repo = "hshmeng-forum";     // 仓库名称
 
-// 异步函数：加载帖子
+// 异步函数：加载帖子列表并逐条显示
 async function loadIssues() {
     const container = document.getElementById("issues-container"); // 获取帖子容器
 
     try {
         // 请求 GitHub API 获取所有公开 Issue（帖子）
         const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/issues?state=open&per_page=100`, {
-            headers: { "Accept": "application/vnd.github+json" } // GitHub 推荐 Accept header
+            headers: { "Accept": "application/vnd.github+json" }
         });
 
-        // 如果请求失败，抛出错误
         if (!res.ok) throw new Error(`API 请求失败: ${res.status}`);
-
-        // 转换为 JSON 数据
-        const issues = await res.json();
+        const issuesList = await res.json();
 
         // 如果没有帖子，显示提示
-        if (!issues || issues.length === 0) {
+        if (!issuesList || issuesList.length === 0) {
             container.innerHTML = "<p style='text-align:center'>暂无帖子</p>";
             return;
         }
 
-        // 遍历每个帖子（Issue）
-        issues.forEach(issue => {
-            const div = document.createElement("div"); // 创建帖子卡片容器
+        // 遍历帖子列表，边请求边渲染
+        for (const issueSummary of issuesList) {
+            // 单独请求每个帖子的详细信息（含 body、labels）
+            const issueRes = await fetch(issueSummary.url, {
+                headers: { "Accept": "application/vnd.github+json" }
+            });
+            const issue = await issueRes.json();
+
+            const div = document.createElement("div");
             div.className = "issue-card";
 
             // =================== 标签部分 ===================
@@ -34,19 +37,12 @@ async function loadIssues() {
             if (issue.labels && issue.labels.length > 0) {
                 labelsHtml = `<div class="issue-labels">`;
                 issue.labels.forEach(label => {
-                    // GitHub API 返回的 label.color 是十六进制（不带 #）
                     const labelColor = `#${label.color}`;
-
-                    // 默认文字白色
                     let textColor = "#fff";
-
-                    // 判断亮色背景，自动调整文字颜色为深色，避免看不清
                     const rgb = parseInt(label.color, 16);
                     if ((rgb & 0xff) + ((rgb >> 8) & 0xff) + ((rgb >> 16) & 0xff) > 382) {
                         textColor = "#333";
                     }
-
-                    // 拼接每个标签的 HTML，使用内联背景色
                     labelsHtml += `<span class="issue-label" style="background-color:${labelColor}; color:${textColor}">${label.name}</span>`;
                 });
                 labelsHtml += `</div>`;
@@ -71,13 +67,13 @@ async function loadIssues() {
                 <div class="comments-container"></div>
             `;
 
-            // 将帖子卡片添加到页面容器
+            // 将帖子卡片添加到页面容器，加载完一条就显示
             container.appendChild(div);
 
             // =================== 评论逻辑 ===================
             const toggleEl = div.querySelector(".comments-toggle");      // 评论展开按钮
             const commentsContainer = div.querySelector(".comments-container"); // 评论容器
-            let commentsLoaded = false; // 标记是否已加载评论，避免重复请求
+            let commentsLoaded = false; // 标记是否已加载评论
 
             toggleEl.addEventListener("click", async () => {
                 // 如果评论已展开，点击收起
@@ -123,7 +119,7 @@ async function loadIssues() {
                     commentsContainer.appendChild(cdiv);
                 });
             });
-        });
+        }
 
     } catch (err) {
         // 捕获错误并显示
