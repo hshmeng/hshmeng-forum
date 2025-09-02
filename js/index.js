@@ -1,45 +1,48 @@
-// 仓库信息
-const owner = "hshmeng";          // GitHub 仓库拥有者
-const repo = "hshmeng-forum";     // 仓库名称
+const owner = "hshmeng";
+const repo = "hshmeng-forum";
 
-// 异步函数：加载帖子列表并逐条显示
+// 渲染 Markdown
+function renderMarkdown(text) {
+    if (!text) return "";
+    return marked.parse(text, {
+        headerIds: false,
+        mangle: false,
+        breaks: true,
+        gfm: true,
+        sanitizer: false
+    });
+}
+
 async function loadIssues() {
-    const container = document.getElementById("issues-container"); // 获取帖子容器
+    const container = document.getElementById("issues-container");
 
     try {
-        // 请求 GitHub API 获取所有公开 Issue（帖子）
         const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/issues?state=open&per_page=100`, {
             headers: { "Accept": "application/vnd.github+json" }
         });
-
         if (!res.ok) throw new Error(`API 请求失败: ${res.status}`);
         const issuesList = await res.json();
 
-        // 如果没有帖子，显示提示
         if (!issuesList || issuesList.length === 0) {
             container.innerHTML = "<p style='text-align:center'>暂无帖子</p>";
             return;
         }
 
-        // 遍历帖子列表，边请求边渲染
         for (const issueSummary of issuesList) {
-            // 单独请求每个帖子的详细信息（含 body、labels）
-            const issueRes = await fetch(issueSummary.url, {
-                headers: { "Accept": "application/vnd.github+json" }
-            });
+            const issueRes = await fetch(issueSummary.url, { headers: { "Accept": "application/vnd.github+json" } });
             const issue = await issueRes.json();
 
             const div = document.createElement("div");
             div.className = "issue-card";
 
-            // =================== 标签部分 ===================
+            // 标签
             let labelsHtml = "";
             if (issue.labels && issue.labels.length > 0) {
                 labelsHtml = `<div class="issue-labels">`;
                 issue.labels.forEach(label => {
                     const labelColor = `#${label.color}`;
                     let textColor = "#fff";
-                    const rgb = parseInt(label.color, 16);
+                    const rgb = parseInt(label.color,16);
                     if ((rgb & 0xff) + ((rgb >> 8) & 0xff) + ((rgb >> 16) & 0xff) > 382) {
                         textColor = "#333";
                     }
@@ -48,7 +51,6 @@ async function loadIssues() {
                 labelsHtml += `</div>`;
             }
 
-            // =================== 帖子 HTML ===================
             div.innerHTML = `
                 <div class="issue-header">
                     <div class="issue-header-left">
@@ -58,53 +60,51 @@ async function loadIssues() {
                     <div class="issue-time">${new Date(issue.created_at).toLocaleString()}</div>
                 </div>
 
-                <!-- 正文内容原样显示，禁止 Markdown -->
-                <div class="issue-body">${(issue.body || "").replace(/</g,"&lt;").replace(/>/g,"&gt;")}</div>
+                <div class="issue-body">${renderMarkdown(issue.body)}</div>
 
-                ${labelsHtml} <!-- 标签显示在正文和评论之间 -->
+                ${labelsHtml}
 
                 <div class="comments-toggle">评论 (${issue.comments}) ▼</div>
                 <div class="comments-container"></div>
             `;
-
-            // 将帖子卡片添加到页面容器，加载完一条就显示
             container.appendChild(div);
 
-            // =================== 评论逻辑 ===================
-            const toggleEl = div.querySelector(".comments-toggle");      // 评论展开按钮
-            const commentsContainer = div.querySelector(".comments-container"); // 评论容器
-            let commentsLoaded = false; // 标记是否已加载评论
+            // 帖子正文点击展开/收回
+            const issueBody = div.querySelector(".issue-body");
+            issueBody.addEventListener("click", () => issueBody.classList.toggle("expanded"));
+
+            // 帖子正文图片点击放大
+            issueBody.querySelectorAll("img").forEach(img => {
+                img.addEventListener("click", () => window.open(img.src, "_blank"));
+            });
+
+            const toggleEl = div.querySelector(".comments-toggle");
+            const commentsContainer = div.querySelector(".comments-container");
+            let commentsLoaded = false;
 
             toggleEl.addEventListener("click", async () => {
-                // 如果评论已展开，点击收起
                 if (commentsContainer.style.display === "block") {
                     commentsContainer.style.display = "none";
                     toggleEl.textContent = `评论 (${issue.comments}) ▼`;
                     return;
                 }
 
-                // 展开评论
                 commentsContainer.style.display = "block";
                 toggleEl.textContent = `评论 (${issue.comments}) ▲`;
 
-                // 如果评论已经加载过，直接显示，不重复请求
                 if (commentsLoaded) return;
                 commentsLoaded = true;
                 commentsContainer.innerHTML = "";
 
-                // 请求该帖子的评论
                 const commentsRes = await fetch(issue.comments_url, {
                     headers: { "Accept": "application/vnd.github+json" }
                 });
                 const comments = await commentsRes.json();
-
-                // 没有评论显示提示
                 if (!comments || comments.length === 0) {
                     commentsContainer.innerHTML = "<p>暂无评论</p>";
                     return;
                 }
 
-                // 遍历每条评论，生成 HTML
                 comments.forEach(c => {
                     const cdiv = document.createElement("div");
                     cdiv.className = "comment";
@@ -112,20 +112,25 @@ async function loadIssues() {
                         <img src="${c.user.avatar_url}" alt="avatar">
                         <div class="comment-body">
                             <div><span class="author">${c.user.login}</span> <span class="time">${new Date(c.created_at).toLocaleString()}</span></div>
-                            <!-- 评论原样显示，禁止 Markdown -->
-                            <div class="comment-text">${c.body.replace(/</g,"&lt;").replace(/>/g,"&gt;")}</div>
+                            <div class="comment-text">${renderMarkdown(c.body)}</div>
                         </div>
                     `;
                     commentsContainer.appendChild(cdiv);
+
+                    // 评论图片点击放大
+                    cdiv.querySelectorAll(".comment-text img").forEach(img => {
+                        img.addEventListener("click", () => window.open(img.src, "_blank"));
+                    });
+
+                    // 评论文本点击展开/收回
+                    const commentText = cdiv.querySelector(".comment-text");
+                    commentText.addEventListener("click", () => commentText.classList.toggle("expanded"));
                 });
             });
         }
-
     } catch (err) {
-        // 捕获错误并显示
         container.innerHTML = `<p style="color:red;text-align:center;">加载失败: ${err.message}</p>`;
     }
 }
 
-// 页面加载时执行
 loadIssues();
