@@ -1,0 +1,45 @@
+/* 右侧固定导航栏样式 */
+#sidebar {
+    position: fixed;           /* 固定在页面右侧 */
+    top: 100px;                /* 距离页面顶部距离，可根据需要调整 */
+    right: 20px;               /* 距离页面右侧距离 */
+    width: 200px;              /* 宽度 */
+    background: #fff;          /* 背景白色 */
+    border: 1px solid #ddd;    /* 边框 */
+    border-radius: 10px;       /* 圆角 */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1); /* 阴影 */
+    padding: 15px;
+    z-index: 9999;             /* 保证覆盖在其他元素之上 */
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+
+#sidebar h3 {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+    color: #333;
+    text-align: center;
+}
+
+#sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#sidebar ul li {
+    margin-bottom: 10px;
+}
+
+#sidebar ul li a {
+    display: block;
+    text-decoration: none;
+    color: #007bff;
+    padding: 6px 10px;
+    border-radius: 6px;
+    transition: background 0.3s, color 0.3s;
+}
+
+#sidebar ul li a:hover {
+    background: #007bff;
+    color: #fff;
+}
