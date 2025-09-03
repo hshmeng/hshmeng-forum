@@ -6,7 +6,7 @@ const repo = "hshmeng-forum";
 let emojiMap = {};
 
 async function loadEmojiMap() {
-    const res = await fetch("../json/emoji.json"); // 确保文件放在根目录 or public 下
+    const res = await fetch("/json/emoji.json"); // 确保文件放在根目录 or public 下
     const data = await res.json();
 
     // 生成映射表 { ":fire:": "🔥", ":bug:": "🐛", ... }
